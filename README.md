@@ -11,11 +11,20 @@ It is further discussed here: https://github.com/rogerwang/node-webkit/issues/93
 
 ## Important Update
 
-Latest review in January required to drop some more APIs, so I also had to patch the webkit located within <pre>node-webkit/src/third_party/WebKit</pre> to get it approved by App Store.
+Latest review in January required to drop some more APIs, so I also had to patch the webkit located within `node-webkit/src/third_party/WebKit` to get it approved by App Store.
 
 ## How to get node-webkit build accepted on Mac App Store
-I figured out that Apple may be rejecting the latest ffmpegsumo.so located under libraries. If you do not use ffmpeg, you may delete the file from <pre>node-webkit Framework.framework/Libraries/ffmpegsumo.so</pre> and resubmit. 
+I figured out that Apple may be rejecting the latest ffmpegsumo.so located under libraries. If you do not use ffmpeg, you may delete the file from `node-webkit Framework.framework/Libraries/ffmpegsumo.so` and resubmit. 
 
-If you do use ffmpeg, however, more investigations are necessary to submit it to App Store.
+If you do use ffmpeg, however, more investigations are necessary to submit it to App Store—it uses certain QtKit APIs that need removal as well (or rather, a conversion to AVFoundation).
 
 The most recent binary of 0.11.5 was accepted by App Store without ffmpegsumo.so on January 26th 2015 (and once with it, too, earlier).
+
+### Submitting to App Store
+
+To ensure successful submittion, you will need to:
+1. Delete the `ffmpegsumo.so` (if you're not using it, as explained above)
+2. Edit the plist to match your app ID
+3. Sign the code with the right entitlements that enable sandbox on it [see here by @trevorlinton](https://www.trueinteractions.com/macstore_sign.sh)
+4. Ensure you do not request the entitlements you do not need (like printing or etc., App Review team checks that)
+5. Finally, create a package with productbuild tool on your Mac and upload to App Store for review.

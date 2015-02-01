@@ -1,0 +1,210 @@
+diff --git a/Source/core/rendering/RenderThemeChromiumMac.mm b/Source/core/rendering/RenderThemeChromiumMac.mm
+index 03e7ce1..45a782c 100644
+--- a/Source/core/rendering/RenderThemeChromiumMac.mm
++++ b/Source/core/rendering/RenderThemeChromiumMac.mm
+@@ -141,11 +141,11 @@ const double progressAnimationNumFrames = 256;
+ @end
+ 
+ // Forward declare Mac SPIs.
+-extern "C" {
+-void _NSDrawCarbonThemeBezel(NSRect frame, BOOL enabled, BOOL flipped);
+-// Request for public API: rdar://13787640
+-void _NSDrawCarbonThemeListBox(NSRect frame, BOOL enabled, BOOL flipped, BOOL always_yes);
+-}
++// extern "C" {
++// void _NSDrawCarbonThemeBezel(NSRect frame, BOOL enabled, BOOL flipped);
++// // Request for public API: rdar://13787640
++// void _NSDrawCarbonThemeListBox(NSRect frame, BOOL enabled, BOOL flipped, BOOL always_yes);
++// }
+ 
+ namespace blink {
+ 
+@@ -751,7 +751,7 @@ bool RenderThemeChromiumMac::paintTextField(RenderObject* o, const PaintInfo& pa
+     // of painting its own background. We need WebCore to paint styled backgrounds, so we'll use
+     // this AppKit SPI function instead.
+     if (!useNSTextFieldCell) {
+-        _NSDrawCarbonThemeBezel(r, isEnabled(o) && !isReadOnlyControl(o), YES);
++        //_NSDrawCarbonThemeBezel(r, isEnabled(o) && !isReadOnlyControl(o), YES);
+         return false;
+     }
+ #endif
+@@ -830,7 +830,7 @@ bool RenderThemeChromiumMac::paintCapsLockIndicator(RenderObject*, const PaintIn
+ bool RenderThemeChromiumMac::paintTextArea(RenderObject* o, const PaintInfo& paintInfo, const IntRect& r)
+ {
+     LocalCurrentGraphicsContext localContext(paintInfo.context);
+-    _NSDrawCarbonThemeListBox(r, isEnabled(o) && !isReadOnlyControl(o), YES, YES);
++    //_NSDrawCarbonThemeListBox(r, isEnabled(o) && !isReadOnlyControl(o), YES, YES);
+     return false;
+ }
+ 
+diff --git a/Source/platform/fonts/mac/ComplexTextControllerCoreText.mm b/Source/platform/fonts/mac/ComplexTextControllerCoreText.mm
+index d2ce51f..021659b 100644
+--- a/Source/platform/fonts/mac/ComplexTextControllerCoreText.mm
++++ b/Source/platform/fonts/mac/ComplexTextControllerCoreText.mm
+@@ -34,10 +34,10 @@
+ #import <AvailabilityMacros.h>
+ 
+ // Forward declare Mac SPIs.
+-extern "C" {
+-// Request for public API: rdar://13803619
+-CTLineRef CTLineCreateWithUniCharProvider(const UniChar* (*provide)(CFIndex stringIndex, CFIndex* charCount, CFDictionaryRef* attributes, void* context), void (*dispose)(const UniChar* chars, void* context), void* context);
+-}
++// extern "C" {
++// // Request for public API: rdar://13803619
++// CTLineRef CTLineCreateWithUniCharProvider(const UniChar* (*provide)(CFIndex stringIndex, CFIndex* charCount, CFDictionaryRef* attributes, void* context), void (*dispose)(const UniChar* chars, void* context), void* context);
++// }
+ 
+ @interface WebCascadeList : NSArray {
+     @private
+@@ -236,7 +236,7 @@ void ComplexTextController::collectComplexTextRunsForCharacters(const UChar* cp,
+     } else {
+         ProviderInfo info = { cp, length, stringAttributes.get() };
+ 
+-        line.adoptCF(CTLineCreateWithUniCharProvider(&provideStringAndAttributes, 0, &info));
++       // line.adoptCF(CTLineCreateWithUniCharProvider(&provideStringAndAttributes, 0, &info));
+     }
+ 
+     m_coreTextLines.append(line.get());
+diff --git a/Source/platform/fonts/mac/SimpleFontDataMac.mm b/Source/platform/fonts/mac/SimpleFontDataMac.mm
+index 43abd6a..a8219fb 100644
+--- a/Source/platform/fonts/mac/SimpleFontDataMac.mm
++++ b/Source/platform/fonts/mac/SimpleFontDataMac.mm
+@@ -63,7 +63,7 @@ extern "C" {
+ bool CGFontGetGlyphAdvancesForStyle(CGFontRef font, CGAffineTransform* transform, CGFontRenderingMode renderingMode, ATSGlyphRef* glyph, size_t count, CGSize* advance);
+ 
+ // Request for public API: rdar://13803619
+-CTLineRef CTLineCreateWithUniCharProvider(const UniChar* (*provide)(CFIndex stringIndex, CFIndex* charCount, CFDictionaryRef* attributes, void* context), void (*dispose)(const UniChar* chars, void* context), void* context);
++//CTLineRef CTLineCreateWithUniCharProvider(const UniChar* (*provide)(CFIndex stringIndex, CFIndex* charCount, CFDictionaryRef* attributes, void* context), void (*dispose)(const UniChar* chars, void* context), void* context);
+ }
+ 
+ static CGFontRenderingMode cgFontRenderingModeForNSFont(NSFont* font) {
+@@ -424,32 +424,32 @@ bool SimpleFontData::canRenderCombiningCharacterSequence(const UChar* characters
+ {
+     ASSERT(isMainThread());
+ 
+-    if (!m_combiningCharacterSequenceSupport)
+-        m_combiningCharacterSequenceSupport = adoptPtr(new HashMap<String, bool>);
++    // if (!m_combiningCharacterSequenceSupport)
++    //     m_combiningCharacterSequenceSupport = adoptPtr(new HashMap<String, bool>);
+ 
+-    WTF::HashMap<String, bool>::AddResult addResult = m_combiningCharacterSequenceSupport->add(String(characters, length), false);
+-    if (!addResult.isNewEntry)
+-        return addResult.storedValue->value;
++    // WTF::HashMap<String, bool>::AddResult addResult = m_combiningCharacterSequenceSupport->add(String(characters, length), false);
++    // if (!addResult.isNewEntry)
++    //     return addResult.storedValue->value;
+ 
+-    RetainPtr<CGFontRef> cgFont(AdoptCF, CTFontCopyGraphicsFont(platformData().ctFont(), 0));
++    // RetainPtr<CGFontRef> cgFont(AdoptCF, CTFontCopyGraphicsFont(platformData().ctFont(), 0));
+ 
+-    ProviderInfo info = { characters, length, getCFStringAttributes(0, platformData().orientation()) };
+-    RetainPtr<CTLineRef> line(AdoptCF, CTLineCreateWithUniCharProvider(&provideStringAndAttributes, 0, &info));
++    // ProviderInfo info = { characters, length, getCFStringAttributes(0, platformData().orientation()) };
++    // RetainPtr<CTLineRef> line(AdoptCF, CTLineCreateWithUniCharProvider(&provideStringAndAttributes, 0, &info));
+ 
+-    CFArrayRef runArray = CTLineGetGlyphRuns(line.get());
+-    CFIndex runCount = CFArrayGetCount(runArray);
++    // CFArrayRef runArray = CTLineGetGlyphRuns(line.get());
++    // CFIndex runCount = CFArrayGetCount(runArray);
+ 
+-    for (CFIndex r = 0; r < runCount; r++) {
+-        CTRunRef ctRun = static_cast<CTRunRef>(CFArrayGetValueAtIndex(runArray, r));
+-        ASSERT(CFGetTypeID(ctRun) == CTRunGetTypeID());
+-        CFDictionaryRef runAttributes = CTRunGetAttributes(ctRun);
+-        CTFontRef runFont = static_cast<CTFontRef>(CFDictionaryGetValue(runAttributes, kCTFontAttributeName));
+-        RetainPtr<CGFontRef> runCGFont(AdoptCF, CTFontCopyGraphicsFont(runFont, 0));
+-        if (!CFEqual(runCGFont.get(), cgFont.get()))
+-            return false;
+-    }
++    // for (CFIndex r = 0; r < runCount; r++) {
++    //     CTRunRef ctRun = static_cast<CTRunRef>(CFArrayGetValueAtIndex(runArray, r));
++    //     ASSERT(CFGetTypeID(ctRun) == CTRunGetTypeID());
++    //     CFDictionaryRef runAttributes = CTRunGetAttributes(ctRun);
++    //     CTFontRef runFont = static_cast<CTFontRef>(CFDictionaryGetValue(runAttributes, kCTFontAttributeName));
++    //     RetainPtr<CGFontRef> runCGFont(AdoptCF, CTFontCopyGraphicsFont(runFont, 0));
++    //     if (!CFEqual(runCGFont.get(), cgFont.get()))
++    //         return false;
++    // }
+ 
+-    addResult.storedValue->value = true;
++    // addResult.storedValue->value = true;
+     return true;
+ }
+ 
+diff --git a/Source/platform/mac/KillRingMac.mm b/Source/platform/mac/KillRingMac.mm
+index 63fd8f8..5d72fee 100644
+--- a/Source/platform/mac/KillRingMac.mm
++++ b/Source/platform/mac/KillRingMac.mm
+@@ -28,56 +28,57 @@
+ 
+ namespace blink {
+ 
+-extern "C" {
++// extern "C" {
+ 
+-// Kill ring calls. Would be better to use NSKillRing.h, but that's not available as API or SPI.
++// // Kill ring calls. Would be better to use NSKillRing.h, but that's not available as API or SPI.
+ 
+-void _NSInitializeKillRing();
+-void _NSAppendToKillRing(NSString *);
+-void _NSPrependToKillRing(NSString *);
+-NSString *_NSYankFromKillRing();
+-void _NSNewKillRingSequence();
+-void _NSSetKillRingToYankedState();
++// void _NSInitializeKillRing();
++// void _NSAppendToKillRing(NSString *);
++// void _NSPrependToKillRing(NSString *);
++// NSString *_NSYankFromKillRing();
++// void _NSNewKillRingSequence();
++// void _NSSetKillRingToYankedState();
+ 
+-}
++// }
+ 
+ static void initializeKillRingIfNeeded()
+ {
+     static bool initializedKillRing = false;
+     if (!initializedKillRing) {
+         initializedKillRing = true;
+-        _NSInitializeKillRing();
++       // _NSInitializeKillRing();
+     }
+ }
+ 
+ void KillRing::append(const String& string)
+ {
+     initializeKillRingIfNeeded();
+-    _NSAppendToKillRing(string);
++    //_NSAppendToKillRing(string);
+ }
+ 
+ void KillRing::prepend(const String& string)
+ {
+     initializeKillRingIfNeeded();
+-    _NSPrependToKillRing(string);
++    //_NSPrependToKillRing(string);
+ }
+ 
+ String KillRing::yank()
+ {
+     initializeKillRingIfNeeded();
+-    return _NSYankFromKillRing();
++    //return _NSYankFromKillRing();
++    return "";
+ }
+ 
+ void KillRing::startNewSequence()
+ {
+     initializeKillRingIfNeeded();
+-    _NSNewKillRingSequence();
++    //_NSNewKillRingSequence();
+ }
+ 
+ void KillRing::setToYankedState()
+ {
+     initializeKillRingIfNeeded();
+-    _NSSetKillRingToYankedState();
++    //_NSSetKillRingToYankedState();
+ }
+ 
+ } // namespace blink

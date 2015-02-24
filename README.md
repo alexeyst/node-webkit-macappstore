@@ -23,8 +23,13 @@ The most recent binary of 0.11.5 was accepted by App Store without ffmpegsumo.so
 ### Submitting to App Store
 
 To ensure successful submittion, you will need to:
+
 1. Delete the `ffmpegsumo.so` (if you're not using it, as explained above)
-2. Edit the plist to match your app ID
-3. Sign the code with the right entitlements that enable sandbox on it [see here by @trevorlinton](https://www.trueinteractions.com/macstore_sign.sh)
-4. Ensure you do not request the entitlements you do not need (like printing or etc., App Review team checks that)
-5. Finally, create a package with productbuild tool on your Mac and upload to App Store for review.
+* Edit the plist to match your app ID
+* Sign the code with the right entitlements that enable sandbox on it [see here by @trevorlinton](https://www.trueinteractions.com/macstore_sign.sh)
+* Ensure you do not request the entitlements you do not need (like printing or etc., App Review team checks that)
+* Finally, create a package with productbuild tool on your Mac and upload to App Store for review.
+
+### Sandboxing Issues
+
+Once sandboxed, the app may crash with `deny forbidden-sandbox-reinit` error. To fix that, please see this [closed issue](https://github.com/alexeyst/node-webkit-macappstore/issues/1) for details.
